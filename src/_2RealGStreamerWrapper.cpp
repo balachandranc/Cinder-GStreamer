@@ -146,6 +146,14 @@ GStreamerWrapper::GStreamerWrapper( std::string strFilename, bool bGenerateVideo
 	open( strFilename, bGenerateVideoBuffer, bGenerateAudioBuffer );
 }
 
+void GStreamerWrapper::addRegistryPath( const std::string path )
+{
+    if( path.size() < 1 ) {
+        return;
+    }
+    GstRegistry* reg = gst_registry_get_default();
+    gst_registry_scan_path( reg, path.c_str() );
+}
 
 GStreamerWrapper::~GStreamerWrapper()
 {
@@ -195,6 +203,8 @@ bool GStreamerWrapper::open( std::string strFilename, bool bGenerateVideoBuffer,
 	// Init main pipeline --> playbin2
 	m_GstPipeline = gst_element_factory_make( "playbin2", "pipeline" );
 
+    std::cout << "pipeline: " << m_GstPipeline << std::endl;
+
 	// Check and re-arrange filename string
 	if ( strFilename.find( "file:/", 0 ) == std::string::npos &&
 		 strFilename.find( "file:///", 0 ) == std::string::npos &&
@@ -205,7 +215,6 @@ bool GStreamerWrapper::open( std::string strFilename, bool bGenerateVideoBuffer,
 
 	// Open Uri
 	g_object_set( m_GstPipeline, "uri", strFilename.c_str(), NULL );
-
 
 	////////////////////////////////////////////////////////////////////////// VIDEO SINK
 	// Extract and Config Video Sink
@@ -220,6 +229,7 @@ bool GStreamerWrapper::open( std::string strFilename, bool bGenerateVideoBuffer,
 
 		// Set some fix caps for the video sink
 		// It would seem that GStreamer then tries to transform any incoming video stream according to these caps
+        /*
 		GstCaps* caps = gst_caps_new_simple( "video/x-raw-rgb",
 			"bpp", G_TYPE_INT, 24,
 			"depth", G_TYPE_INT, 24,
@@ -229,6 +239,16 @@ bool GStreamerWrapper::open( std::string strFilename, bool bGenerateVideoBuffer,
 			"blue_mask",G_TYPE_INT,0x0000ff,
 			"alpha_mask",G_TYPE_INT,0x000000ff,
 			NULL );
+        */
+        GstCaps* caps = gst_caps_new_simple( "video/x-raw-rgb",
+            "bpp", G_TYPE_INT, 32,
+            "depth", G_TYPE_INT, 32,
+            "endianness", G_TYPE_INT, 4321,
+            "red_mask", G_TYPE_INT, 0xff00,
+            "green_mask", G_TYPE_INT, 0xff0000,
+            "blue_mask", G_TYPE_INT, 0xff000000,
+            "alpha_mask", G_TYPE_INT, 0xff,
+            NULL );
 
 
 		gst_app_sink_set_caps( GST_APP_SINK( m_GstVideoSink ), caps );

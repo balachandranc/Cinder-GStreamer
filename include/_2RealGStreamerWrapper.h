@@ -53,6 +53,11 @@
 // us this for threaded message handling so you don't need update, but it needs a dependency for boost threads...
 #define THREADED_MESSAGE_HANDLER
 
+#define __STDC_LIMIT_MACROS
+//#define __STDC_CONSTANT_MACROS
+#include <cstdint>
+#define INTMAX_MAX   INT64_MAX
+
 #include <gst/gst.h>
 #include <gst/gstbin.h>
 #include <gst/app/gstappsink.h>
@@ -499,7 +504,7 @@ namespace _2RealGStreamerWrapper
 		*/
 		Endianness				getAudioEndianness();
 
-
+        void                    addRegistryPath( const std::string path );
 
 	private:
 		/*
