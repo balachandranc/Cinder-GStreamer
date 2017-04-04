@@ -1,5 +1,10 @@
 #pragma once
 
+#define __STDC_LIMIT_MACROS
+//#define __STDC_CONSTANT_MACROS
+#include <cstdint>
+#define INTMAX_MAX   INT64_MAX
+
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -57,7 +62,7 @@ private:
 
 void cinderGStreamerGUIApp::setup()
 {
- 		m_Instance = this;
+ 		//m_Instance = this;
 		FILE* f;
 		freopen_s(&f, "CON", "w", stdout);
 
@@ -77,7 +82,9 @@ void cinderGStreamerGUIApp::setup()
 		gl::enableAlphaBlending();
 
 		std::shared_ptr<GStreamerWrapper> testFile = std::shared_ptr<GStreamerWrapper>(new GStreamerWrapper());
-		std::string path = "file:/" + getAppPath().string() + "/data/morph.avi";
+        testFile->addRegistryPath( getAppPath().string() );
+		//std::string path = "file:/" + getAppPath().string() + "/data/morph.avi";
+        std::string path = "c:/media/etho.mp4";
 		if (testFile->open(path, m_bUseVideoBuffer, m_bUseAudioBuffer))
 		{
 			m_Players.push_back(testFile);
@@ -117,7 +124,7 @@ void cinderGStreamerGUIApp::draw()
 	int posX;
 	int posY;
 
-	gl::clear();
+	gl::clear( Color::white() );
 
 	for (int i = 0; i<m_Players.size(); i++)
 	{
@@ -127,7 +134,7 @@ void cinderGStreamerGUIApp::draw()
 			unsigned char* pImg = m_Players[i]->getVideo();
 			if (pImg != nullptr)
 			{
-				m_VideoTextures[i] = gl::Texture::create(ci::Surface(pImg, m_Players[i]->getWidth(), m_Players[i]->getHeight(), m_Players[i]->getWidth() * 3, ci::SurfaceChannelOrder::RGB));
+				m_VideoTextures[i] = gl::Texture::create(ci::Surface(pImg, m_Players[i]->getWidth(), m_Players[i]->getHeight(), m_Players[i]->getWidth() * 4, ci::SurfaceChannelOrder::BGRA ));
 			}
 		}
 
@@ -355,4 +362,6 @@ void cinderGStreamerGUIApp::mouseDown(MouseEvent event)
 }
 
 // This line tells Cinder to actually create the application
-CINDER_APP( cinderGStreamerGUIApp, RendererGl )
+CINDER_APP( cinderGStreamerGUIApp, RendererGl, [&]( App::Settings *settings ) {
+    settings->setConsoleWindowEnabled();
+} )
