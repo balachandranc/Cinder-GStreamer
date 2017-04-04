@@ -6,3 +6,7 @@ Thumbs.db
 *.exe
 *.out
 *.app
+build/
+samples/cinderGStreamerGUI/vc2013/Release/
+samples/cinderGStreamerGUI/vc2013/Debug/
+*.sdf
